@@ -1,0 +1,121 @@
+-- Create Database
+CREATE DATABASE SchoolDB;
+USE SchoolDB;
+
+-- Students Table
+CREATE TABLE Students (
+    student_id INT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    gender VARCHAR(10),
+    date_of_birth DATE,
+    class_id INT
+);
+
+-- Classes Table
+CREATE TABLE Classes (
+    class_id INT PRIMARY KEY,
+    class_name VARCHAR(20),
+    teacher_id INT
+);
+
+-- Teachers Table
+CREATE TABLE Teachers (
+    teacher_id INT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    subject VARCHAR(50)
+);
+
+-- Marks Table
+CREATE TABLE Marks (
+    mark_id INT PRIMARY KEY,
+    student_id INT,
+    subject VARCHAR(50),
+    marks INT,
+    FOREIGN KEY (student_id) REFERENCES Students(student_id)
+);
+
+-- Insert Sample Data into Classes
+INSERT INTO Classes VALUES
+(1, 'Class 9', 101),
+(2, 'Class 10', 102);
+
+-- Insert Sample Data into Teachers
+INSERT INTO Teachers VALUES
+(101, 'Amit', 'Sharma', 'Mathematics'),
+(102, 'Sunita', 'Verma', 'Science');
+
+-- Insert Sample Data into Students
+INSERT INTO Students VALUES
+(1, 'Ravi', 'Kumar', 'Male', '2010-05-10', 1),
+(2, 'Priya', 'Singh', 'Female', '2009-08-15', 2),
+(3, 'Ankit', 'Yadav', 'Male', '2010-11-22', 1),
+(4, 'Neha', 'Gupta', 'Female', '2009-02-05', 2);
+
+-- Insert Sample Data into Marks
+INSERT INTO Marks VALUES
+(1, 1, 'Mathematics', 85),
+(2, 1, 'Science', 78),
+(3, 2, 'Mathematics', 92),
+(4, 2, 'Science', 88),
+(5, 3, 'Mathematics', 56),
+(6, 3, 'Science', 62),
+(7, 4, 'Mathematics', 74),
+(8, 4, 'Science', 69);
+
+-- Example Queries
+
+-- 1. Show all students with their class names
+SELECT s.first_name, s.last_name, c.class_name
+FROM Students s
+JOIN Classes c ON s.class_id = c.class_id;
+
+-- 2. List the names of students who are in Class 10
+SELECT first_name, last_name
+FROM Students
+WHERE class_id = 2;
+
+-- 3. Count the total number of students in each class
+SELECT c.class_name, COUNT(s.student_id) AS total_students
+FROM Students s
+JOIN Classes c ON s.class_id = c.class_id
+GROUP BY c.class_name;
+
+-- 4. Find the youngest student in the school
+SELECT first_name, last_name, date_of_birth
+FROM Students
+ORDER BY date_of_birth DESC
+LIMIT 1;
+
+-- 5. Show all teachers and the classes they teach
+SELECT t.first_name, t.last_name, c.class_name
+FROM Teachers t
+JOIN Classes c ON t.teacher_id = c.teacher_id;
+
+-- 6. List students who scored less than 60 marks in any subject
+SELECT s.first_name, s.last_name, m.subject, m.marks
+FROM Students s
+JOIN Marks m ON s.student_id = m.student_id
+WHERE m.marks < 60;
+
+-- 7. Find the average marks of each student
+SELECT s.first_name, s.last_name, AVG(m.marks) AS avg_marks
+FROM Students s
+JOIN Marks m ON s.student_id = m.student_id
+GROUP BY s.student_id;
+
+-- 8. Show the highest marks scored in Mathematics
+SELECT MAX(marks) AS highest_math_marks
+FROM Marks
+WHERE subject = 'Mathematics';
+
+-- 9. Find the total number of male and female students
+SELECT gender, COUNT(*) AS total
+FROM Students
+GROUP BY gender;
+
+-- 10. Display each subject along with the highest marks scored in it
+SELECT subject, MAX(marks) AS highest_marks
+FROM Marks
+GROUP BY subject;
